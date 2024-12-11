@@ -1,13 +1,16 @@
+def gv
+
 pipeline {
 	agent any
 	triggers {
 		githubPush()
 	}
 	stages {
-		stage("Checkout") {
+		stage("Build") {
 			steps {
-				echo "Checking out code..."
-				checkout scm
+				script {
+					gv = load "script.groovy"
+				}
 			}
 		}
 	}	
