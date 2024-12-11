@@ -1,17 +1,34 @@
-def gv
-
 pipeline {
 	agent any
 	triggers {
 		githubPush()
 	}
 	stages {
-		stage("Build") {
+		stage('Checkout') {
 			steps {
-				script {
-					gv = load "script.groovy"
-				}
+				echo 'Cheking out code...'
 			}
 		}
-	}	
+
+		stage('Build') {
+			steps {
+				echo 'Building the application...'
+			}
+		}
+		
+		stage('Deploy') {
+			steps {
+				echo 'deploying the application...'
+			}
+		}
+	}
+
+	post {
+		success {
+			echo 'Build is succeeded'
+		}
+		failure {
+			echo 'Build is failed'
+		}
+	}
 }
