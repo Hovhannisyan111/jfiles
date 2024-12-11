@@ -1,34 +1,42 @@
 pipeline {
-	agent any
-	triggers {
-		githubPush()
+	agent {
+		docker {
+			image 'python:3.10'
+		}
 	}
+	
+	environment {
+		PYTHONUNBUFFERED = 1
+	}
+	
 	stages {
-		stage('Checkout') {
+		stage('Clone repo') {
 			steps {
-				echo 'Cheking out code...'
+				git 'https://github.com/Hovhannisyan111/jfiles.git'
 			}
 		}
 
-		stage('Build') {
+		stage('Install deps') {
 			steps {
-				echo 'Building the application...'
+				sh 'pip install -r requirements.txt'
 			}
 		}
 		
-		stage('Deploy') {
+		stage('Run test') {
 			steps {
-				echo 'deploying the application...'
+				sh 'pytest --junitxml=report.xml'
+			}
+			post{
+				always {
+					junit 'report.xml'
+				}
 			}
 		}
 	}
 
 	post {
-		success {
-			echo 'Build is succeeded'
-		}
-		failure {
-			echo 'Build is failed'
+		always {
+			cleanWs()
 		}
 	}
 }
