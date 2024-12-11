@@ -1,12 +1,14 @@
 pipeline {
-    agent any
-
-    stages {
-        stage("Build") {
-            steps {
-                echo "Starting BUILD stage"
-                }
-            }
-        }
+	agent any
+	triggers {
+		githubPush()
+	}
+	stages {
+		stage("Checkout") {
+			steps {
+				echo "Checking out code..."
+				checkout scm
+			}
+		}
+	}	
 }
-
