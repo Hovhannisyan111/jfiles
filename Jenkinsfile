@@ -1,5 +1,9 @@
 pipeline{
 	agent any
+
+	environment {
+		ARTIFACT_DIR = "build/artifacts"
+	}
 	
 	stages {
 		stage('Checkout') {
@@ -11,8 +15,9 @@ pipeline{
 
 		stage("Run script") {
 			steps {
-				echo "Running python script"
-				sh "python3 main.py"
+				script {
+					sh "bash build.sh"
+				}
 			}
 		}
 
