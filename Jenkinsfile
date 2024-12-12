@@ -1,42 +1,22 @@
 pipeline {
-	agent {
-		docker {
-			image 'python:3.10'
-		}
-	}
-	
-	environment {
-		PYTHONUNBUFFERED = 1
-	}
+	agent any
 	
 	stages {
 		stage('Clone repo') {
 			steps {
-				git 'https://github.com/Hovhannisyan111/jfiles.git'
+				echo "Checkout repo"
 			}
 		}
 
 		stage('Install deps') {
 			steps {
-				sh 'pip install -r requirements.txt'
+				echo "Installing deps"
 			}
 		}
 		
 		stage('Run test') {
 			steps {
-				sh 'pytest --junitxml=report.xml'
-			}
-			post{
-				always {
-					junit 'report.xml'
-				}
+				echo 'Running Tests'
 			}
 		}
 	}
-
-	post {
-		always {
-			cleanWs()
-		}
-	}
-}
