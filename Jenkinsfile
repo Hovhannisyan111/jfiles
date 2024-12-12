@@ -1,22 +1,35 @@
-pipeline {
+pipeline{
 	agent any
 	
 	stages {
-		stage('Clone repo') {
+		stage('Checkout') {
 			steps {
-				echo "Checkout repo"
+				echo "Checking out source code..."
+				checkout scm
 			}
 		}
 
-		stage('Install deps') {
+		stage("Run script") {
 			steps {
-				echo "Installing deps"
+				echo "Running python script"
+				sh "python3 main.py"
 			}
 		}
-		
-		stage('Run test') {
+
+		stage("Archive artifact") {
 			steps {
-				echo 'Running Tests'
+				echo "Arachiving the script output..."
+				archiveArtifacts artifacts: "output.log", fingerprint: true
 			}
 		}
 	}
+
+	post {
+		success {
+			echo "Pipeline compieted successfully!"
+		}
+		failure {
+			echo "Pipline failed!"
+		}
+	}
+}
