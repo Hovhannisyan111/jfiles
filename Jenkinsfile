@@ -11,7 +11,7 @@ pipeline {
 					}
 					axis {
 						name "PY_VERSION"
-						values "2", "3"
+						values "2", "3", "3.9"
 					}
 				}
 				stages {
