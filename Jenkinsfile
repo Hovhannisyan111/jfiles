@@ -1,39 +1,63 @@
 pipeline {
-	agent any
-
-	stages {
-		stage("Using maxtrix") {
-			matrix {
-				axes {
-					axis {
-						name "PLATFORM"
-						values "linux", "macos", "windows" 	
-					}
-					axis {
-						name "PY_VERSION"
-						values "2", "3", "3.9"
-					}
-				}
-				excludes {
-					exclude {
-						axis {
-							name "PLATFORM"
-							values "macos"
-						}
-						axis {
-							name "PY_VERSION"
-							values "2"
-						}
-					}
-				}
-				stages {
-					stage("Print") {
-						steps{
-							echo "Running on ${PLATFORM} with Python ${PY_VERSION}"
-						}	
-					}
-				}
-			}			
-		}
-	}
+    parameters {
+        choice(name: 'PLATFORM_FILTER', choices: ['all', 'linux', 'windows', 'mac'], description: 'Run on specific platform')
+    }
+    agent none
+    stages {
+        stage('BuildAndTest') {
+            matrix {
+                agent {
+                    label "${PLATFORM}-agent"
+                }
+                when { anyOf {
+                    expression { params.PLATFORM_FILTER == 'all' }
+                    expression { params.PLATFORM_FILTER == env.PLATFORM }
+                } }
+                axes {
+                    axis {
+                        name 'PLATFORM'
+                        values 'linux', 'windows', 'mac'
+                    }
+                    axis {
+                        name 'BROWSER'
+                        values 'firefox', 'chrome', 'safari', 'edge'
+                    }
+                }
+                excludes {
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            values 'linux'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'safari'
+                        }
+                    }
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            notValues 'windows'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'edge'
+                        }
+                    }
+                }
+                stages {
+                    stage('Build') {
+                        steps {
+                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                    stage('Test') {
+                        steps {
+                            echo "Do Test for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
